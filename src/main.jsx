@@ -6,7 +6,7 @@ import { ToastContainer } from 'react-toastify'
 import { BrowserRouter } from 'react-router-dom'
 
 createRoot(document.getElementById('root')).render(
-    <BrowserRouter basename="/predesalud_front">
+    <BrowserRouter>
       <ToastContainer position='top-left'/>
       <App/>
     </BrowserRouter>,
