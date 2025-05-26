@@ -21,7 +21,6 @@ const InitialForm = ({setStatus,setDocumentNumber}) => {
             console.log(error)
             toast.error(error)
         }
-
     } 
 
     const handleDocument = (e) => {
@@ -35,7 +34,7 @@ const InitialForm = ({setStatus,setDocumentNumber}) => {
                     <h2 class="text-4xl text-blue-600 text-center font-bold mb-4">
                         ¡Bienvenid@!
                     </h2>
-                    <p className='text-center mt-3'> Ingresa la información solicitada para dar inicio a tu solicitud </p>
+                    <p className='text-center mt-3'> Ingresa la información para dar inicio a tu solicitud </p>
                     <form class="space-y-5 mt-5">
                         <div>
                             <label class="block text-sm font-medium mb-1" for="name">Número de documento: </label>
