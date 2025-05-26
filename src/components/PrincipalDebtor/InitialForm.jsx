@@ -39,7 +39,7 @@ const InitialForm = ({setStatus,setDocumentNumber}) => {
                     <form class="space-y-5 mt-5">
                         <div>
                             <label class="block text-sm font-medium mb-1" for="name">Número de documento: </label>
-                            <input type="text" 
+                            <input type="number" 
                                 id="name"
                                 placeholder='Ingresa tú número de documento.' 
                                 class="w-full border border-gray-400 mt-2 rounded px-3 py-2 focus:outline-none 
