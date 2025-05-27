@@ -1,7 +1,11 @@
 import axios from "axios";
 
+//https://neptuno.valcredit.co:3006/api/demo
+//http://localhost:3006/api/demo
+
+
 export const crediexpressAPI = axios.create({
-    baseURL: 'http://localhost:3006/api/demo',
+    baseURL: 'https://neptuno.valcredit.co:3006/api/demo',
     timeout: 15000,
     headers: {
         'Content-Type': 'application/json'

@@ -156,7 +156,7 @@ const DSForm = () => {
 
                     <div className="col-span-2">
                         <label htmlFor="birthdate" className="block text-sm font-medium">Fecha de nacimiento:</label>
-                        <input type="date" {...register("birthdate")} id="birthdate"
+                        <input type="date" {...register("birthdate")} id="birthdate" min="1970-01-01" max="2004-12-31"
                             className="w-full border border-gray-300 mt-2 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-300"/>
 
                         {errors.birthdate && (
