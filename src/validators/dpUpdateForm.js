@@ -1,4 +1,3 @@
-import { differenceInYears } from "date-fns";
 import * as Yup from "yup";
 
 export const dpUpdateFormSchema = Yup.object().shape({
@@ -42,7 +41,7 @@ export const dpUpdateFormSchema = Yup.object().shape({
   city: Yup.string()
            .required("Selecciona una ciudad"),
 
-  gender: Yup.string()
-            .required("Selecciona un género"),
+  requested_amount : Yup.string()
+                        .required("El monto es requerido")
 
 });

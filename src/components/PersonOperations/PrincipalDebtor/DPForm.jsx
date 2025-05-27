@@ -42,11 +42,11 @@ const DPForm = ({person_data, setStatus}) => {
 
     
     useEffect(() => {
-        if (person_data) {
+        if (person_data && cities.length > 0) {
             setValue("first_name", person_data.first_name || "");
-            setValue("second_name", person_data.middle_name || "");
-            setValue("first_lastname", person_data.first_lastname || "");
-            setValue("second_lastname", person_data.second_last_name || "");
+            setValue("middle_name", person_data.middle_name || "");
+            setValue("first_surname", person_data.first_surname || "");
+            setValue("second_last_name", person_data.second_last_name || "");
             setValue("email", person_data.email || "");
             setValue("document_type", person_data.document_type || "");
             setValue("document_number", person_data.document_number || "");
@@ -61,9 +61,8 @@ const DPForm = ({person_data, setStatus}) => {
             if (storedAmount) {
                 setRequestedAmountDisplay(formatCurrency(storedAmount));
             }
-
         }
-    }, [person_data]);
+    }, [person_data, cities]);
 
 
     useEffect(() => {
@@ -74,7 +73,10 @@ const DPForm = ({person_data, setStatus}) => {
 
     const onSubmit = async (data) => {
 
+        console.log(errors)
+
         var requestedAmount
+
 
         try {
             const {
@@ -129,7 +131,7 @@ const DPForm = ({person_data, setStatus}) => {
                     person_data: payload,
                 });
 
-                if(localStorage.getItem("requested_amount") != person_data.requested_amount){
+                if(localStorage.getItem("requested_amount") != requestedAmount){
                     localStorage.setItem("requested_amount", requestedAmount)
                 }
 
@@ -225,7 +227,7 @@ const DPForm = ({person_data, setStatus}) => {
 
                     <div>
                         <label htmlFor="first_surname" className="block text-sm font-medium">Primer apellido:</label>
-                        <input type="text" {...register("first_surname")} id="first_lastname"
+                        <input type="text" {...register("first_surname")} id="first_surname"
                             className="w-full border border-gray-300 mt-2 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-300"
                             placeholder="Ingresa tu primer apellido"/>
 
@@ -368,6 +370,7 @@ const DPForm = ({person_data, setStatus}) => {
                         <label htmlFor="requested_amount" className="block text-sm font-medium">Monto solicitado:</label>
                         <input
                             type="text"
+                            {...register("requested_amount")} 
                             id="requested_amount"
                             value={requestedAmountDisplay}
                             onChange={(e) => {

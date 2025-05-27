@@ -42,7 +42,4 @@ export const dsFormSchema = Yup.object().shape({
    city: Yup.string()
             .required("Selecciona una ciudad"),
 
-   gender: Yup.string()
-               .required("Selecciona un género"),
-
 });
