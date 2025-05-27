@@ -2,10 +2,8 @@ import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { apiColombia, crediexpressAPI } from "../../../api/axiosClient";
 import { checkAge, nationalities } from "../../../utils/utils";
-import { dpFormSchema } from "../../../validators/dpForm";
 import { yupResolver } from "@hookform/resolvers/yup/src/yup.js";
 import { toast } from "react-toastify";
-import { useNavigate, useParams } from "react-router-dom";
 import { dsFormSchema } from "../../../validators/dsForm";
 
 const DSForm = () => {
@@ -34,18 +32,17 @@ const DSForm = () => {
             const {
                 first_name,
                 second_name,
-                first_lastname,
-                second_lastname,
+                first_surname,
+                second_last_name,
                 email,
                 document_type,
                 document_number,
                 cellular,
                 birthdate,
                 nationality,
-                expedition_date,
+                expedition_location,
                 address,
                 city,
-                gender,
             } = data;
 
             if(nationality != "Colombia"){
@@ -61,29 +58,34 @@ const DSForm = () => {
             }
 
 
-            //Armar nombre completo dinámico
             const fullname = [
                 first_name,
                 second_name,
-                first_lastname,
-                second_lastname,
+                first_surname,
+                second_last_name,
             ].filter(Boolean).join(" ");
+
+
+            const payload = {
+                first_name,
+                middle_name: second_name,         // Opcional
+                first_surname,
+                second_last_name: second_last_name, // Opcional
+                email,
+                document_type,
+                document_number,
+                cellular,
+                birthdate,
+                nationality,
+                expedition_location,
+                address,
+                city,
+                requested_amount,
+            }
 
             // Enviar al backend
             const response = await crediexpressAPI.post("/func/create_only_ds", {
-                person_data: {
-                    name: fullname,
-                    email,
-                    document_type,
-                    document_number,
-                    cellular,
-                    birthdate,
-                    nationality,
-                    expedition_date,
-                    address,
-                    city,
-                    gender
-                },
+                person_data: payload
             });
 
             toast.success("Se realizó el registro del deudor solidario")
@@ -129,8 +131,8 @@ const DSForm = () => {
                     </div>
 
                     <div>
-                        <label htmlFor="first_lastname" className="block text-sm font-medium">Primer apellido:</label>
-                        <input type="text" {...register("first_lastname")} id="first_lastname"
+                        <label htmlFor="first_surname" className="block text-sm font-medium">Primer apellido:</label>
+                        <input type="text" {...register("first_surname")} id="first_lastname"
                             className="w-full border border-gray-300 mt-2 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-300"
                             placeholder="Ingresa tu primer apellido"/>
 
@@ -141,8 +143,8 @@ const DSForm = () => {
                     </div>
 
                     <div>
-                        <label htmlFor="second_lastname" className="block text-sm font-medium">Segundo apellido:</label>
-                        <input type="text" {...register("second_lastname")} id="second_lastname"
+                        <label htmlFor="second_last_name" className="block text-sm font-medium">Segundo apellido:</label>
+                        <input type="text" {...register("second_last_name")} id="second_lastname"
                             className="w-full border border-gray-300 mt-2 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-300"
                             placeholder="Ingresa tu segundo apellido"/>
 
@@ -170,7 +172,7 @@ const DSForm = () => {
                             <option value="">Selecciona..</option>
                             <option value="CC"> Cédula de ciudadania</option>
                             <option value="CE"> Cédula de extranjeria</option>
-                            <option value="PP"> Pasaporte</option>
+                            <option value="TPT"> Permiso de protección temporal</option>
                         </select>
 
                             {errors.document_type && (
@@ -190,13 +192,18 @@ const DSForm = () => {
                     </div>
 
                     <div className="col-span-2">
-                        <label htmlFor="expedition_date" className="block text-sm font-medium">Fecha de expedición:</label>
-                        <input type="date" {...register("expedition_date")} id="expedition_date"
-                            className="w-full border border-gray-300 mt-2 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-300"/>
+                        <label htmlFor="expedition_location" className="block text-sm font-medium">Lugar de expedición:</label>
+                        <select {...register("expedition_location")}
+                            className="w-full border border-gray-300 mt-2 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-300">
+                            <option value="">Selecciona una ciudad</option>
+                            {cities.map((city) => (
+                                <option key={city.id} value={city.name}>{city.name}</option>
+                            ))}
+                        </select>
 
 
-                        {errors.expedition_date && (
-                            <span className="text-red-500 text-sm mt-2">{errors.expedition_date.message}</span>
+                        {errors.expedition_location && (
+                            <span className="text-red-500 text-sm mt-2">{errors.expedition_location.message}</span>
                         )}
                     </div>
 
@@ -265,21 +272,6 @@ const DSForm = () => {
                             <span className="text-red-500 text-sm mt-2">{errors.address.message}</span>
                         )}
 
-                    </div>
-
-
-                    <div>
-                        <label htmlFor="gender" className="block text-sm font-medium">Género:</label>
-                        <select {...register("gender")}
-                            className="w-full border border-gray-300 mt-2 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-300">
-                            <option value="">Selecciona...</option>
-                            <option value="M">Masculino</option>
-                            <option value="F">Femenino</option>
-                        </select>
-
-                        {errors.gender && (
-                            <span className="text-red-500 text-sm mt-2">{errors.gender.message}</span>
-                        )}
                     </div>
 
                     <div className="md:col-span-2">

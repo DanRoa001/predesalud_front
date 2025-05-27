@@ -2,6 +2,8 @@ import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { crediexpressAPI } from '../../../api/axiosClient'
 import { toast } from 'react-toastify'
+import withReactContent from 'sweetalert2-react-content'
+import Swal from 'sweetalert2'
 
 const StartRequest = () => {
 
@@ -27,6 +29,15 @@ const StartRequest = () => {
                 break
             }
         } catch (error) {
+
+            if(error.response?.data?.status === "open_request") {
+                withReactContent(Swal).fire({
+                    title: "Tienes una solicitud abierta",
+                    text: error.response.data.error,
+                    showCloseButton : true,
+                })
+            }
+
             console.error(error)
             toast.error("Error al buscar el documento")
         }
@@ -38,6 +49,9 @@ const StartRequest = () => {
                 <div className="w-full ml-auto max-w-md bg-white shadow-2xl border border-gray-400 p-6 rounded-2xl">
                     {/* <h2 className="text-4xl text-blue-600 text-center font-bold mb-4">¡Bienvenid@!</h2> */}
                     <p className="text-center mt-3">Ingresa la información para dar inicio a tu solicitud</p>
+                    
+                    <hr className="mt-3"/>
+                    
                     <form className="space-y-5 mt-5" onSubmit={e => e.preventDefault()}>
                         <div>
                         <label className="block text-sm font-medium mb-1" htmlFor="doc">Número de documento:</label>

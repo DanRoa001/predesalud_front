@@ -4,14 +4,12 @@ export const dpUpdateFormSchema = Yup.object().shape({
   first_name: Yup.string()
                  .required("El primer nombre es obligatorio"),
 
-  second_name: Yup.string()
-                  .required("El segundo nombre es obligatorio"),
+  second_name: Yup.string(),
 
-  first_lastname: Yup.string()
+  first_surname: Yup.string()
                      .required("El primer apellido es obligatorio"),
 
-  second_lastname: Yup.string()
-                      .required("El segundo apellido es requerido"),
+  second_last_name: Yup.string(),
 
   email: Yup.string()
             .required("El correo es obligatorio")
@@ -25,7 +23,8 @@ export const dpUpdateFormSchema = Yup.object().shape({
 
   cellular: Yup.string()
               .required("El celular es obligatorio")
-              .matches(/^\d+$/, "Solo números"),
+              .matches(/^\d+$/, "Solo números")
+              .length(10, "Minimo 10 digitos"),
 
   birthdate: Yup.string()
                 .required("La fecha de nacimiento es obligatoria"),
@@ -33,8 +32,8 @@ export const dpUpdateFormSchema = Yup.object().shape({
   nationality: Yup.string()
                   .required("Selecciona una nacionalidad"),
 
-  expedition_date: Yup.string()
-                      .required("La fecha de expedición es obligatoria"),
+  expedition_location: Yup.string()
+                      .required("El lugar de expedición es obligatorio"),
 
   address: Yup.string()
               .required("La dirección es obligatoria"),

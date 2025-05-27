@@ -4,6 +4,8 @@ import { crediexpressAPI } from '../../api/axiosClient';
 import { formatCurrency } from '../../utils/utils';
 import { BeatLoader } from 'react-spinners';
 import { toast } from 'react-toastify';
+import withReactContent from 'sweetalert2-react-content';
+import Swal from 'sweetalert2';
 
 const CheckRequest = () => {
 
@@ -77,6 +79,9 @@ const CheckRequest = () => {
             <div className="flex flex-col items-center justify-center h-full text-center lg:mr-16">
                 <div className="w-full max-w-lg bg-white shadow-2xl border border-gray-400 p-6 rounded-2xl">
                     <h1 className="text-2xl font-bold mb-4">Resumen de la Solicitud</h1>
+
+                    <hr className="mt-3"/>
+
 
                     {loadingRequest && (
                         <>

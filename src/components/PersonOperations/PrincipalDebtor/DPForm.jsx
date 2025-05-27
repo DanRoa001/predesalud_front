@@ -1,26 +1,29 @@
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { apiColombia, crediexpressAPI } from "../../../api/axiosClient";
-import { checkAge, formatCurrency, nationalities } from "../../../utils/utils"
+import { formatCurrency, nationalities } from "../../../utils/utils"
 import { dpFormSchema } from "../../../validators/dpForm";
 import { dpUpdateFormSchema } from "../../../validators/dpUpdateForm";
 import { yupResolver } from "@hookform/resolvers/yup/src/yup.js";
 import { toast } from "react-toastify";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import withReactContent from "sweetalert2-react-content";
 import Swal from "sweetalert2";
 
 const DPForm = ({person_data, setStatus}) => {
 
-    const { document_number } = useParams()
+    const [searchParams] = useSearchParams()
 
     const { register, handleSubmit , setValue, formState: { errors }} = useForm({ 
         resolver: yupResolver(person_data ? dpUpdateFormSchema : dpFormSchema)
     });
 
     const [requestedAmountDisplay, setRequestedAmountDisplay] = useState('');
-
+    const navigate = useNavigate()
     const [cities, setCities] = useState([]);
+
+
+    const document = searchParams.get("document")
 
     useEffect(() => {
         const fetchCities = async () => {
@@ -40,32 +43,34 @@ const DPForm = ({person_data, setStatus}) => {
     
     useEffect(() => {
         if (person_data) {
-            const [first_name, second_name, ...lastNames] = person_data.name.split(" ");
-            const [first_lastname = "", second_lastname = ""] = lastNames;
-
-            setValue("first_name", first_name || "");
-            setValue("second_name", second_name || "");
-            setValue("first_lastname", first_lastname);
-            setValue("second_lastname", second_lastname);
+            setValue("first_name", person_data.first_name || "");
+            setValue("second_name", person_data.middle_name || "");
+            setValue("first_lastname", person_data.first_lastname || "");
+            setValue("second_lastname", person_data.second_last_name || "");
             setValue("email", person_data.email || "");
             setValue("document_type", person_data.document_type || "");
             setValue("document_number", person_data.document_number || "");
             setValue("birthdate", person_data.birthdate || "");
-            setValue("expedition_date", person_data.expedition_date || "");
+            setValue("expedition_location", person_data.expedition_location || "");
             setValue("cellular", person_data.cellular || "");
             setValue("nationality", person_data.nationality || "");
             setValue("address", person_data.address || "");
             setValue("city", person_data.city || "");
-            setValue("gender", person_data.gender || "");
+
+            const storedAmount = localStorage.getItem("requested_amount");
+            if (storedAmount) {
+                setRequestedAmountDisplay(formatCurrency(storedAmount));
+            }
+
         }
     }, [person_data]);
 
 
     useEffect(() => {
-        if (document_number) {
-            setValue("document_number", document_number);
+        if (document) {
+            setValue("document_number", document);
         }
-    }, [document_number]);
+    }, [document]);
 
     const onSubmit = async (data) => {
 
@@ -75,40 +80,41 @@ const DPForm = ({person_data, setStatus}) => {
             const {
                 first_name,
                 second_name,
-                first_lastname,
-                second_lastname,
+                first_surname,
+                second_last_name,
                 email,
                 document_type,
                 document_number,
                 cellular,
                 birthdate,
                 nationality,
-                expedition_date,
+                expedition_location,
                 address,
                 city,
-                gender,
                 requested_amount,
             } = data;
 
             const fullname = [
                 first_name,
                 second_name,
-                first_lastname,
-                second_lastname,
+                first_surname,
+                second_last_name,
             ].filter(Boolean).join(" ");
 
             const payload = {
-                name: fullname,
+                first_name,
+                middle_name: second_name,         // Opcional
+                first_surname,
+                second_last_name: second_last_name, // Opcional
                 email,
                 document_type,
                 document_number,
                 cellular,
                 birthdate,
                 nationality,
-                expedition_date,
+                expedition_location,
                 address,
                 city,
-                gender,
                 requested_amount,
             };
 
@@ -123,6 +129,10 @@ const DPForm = ({person_data, setStatus}) => {
                     person_data: payload,
                 });
 
+                if(localStorage.getItem("requested_amount") != person_data.requested_amount){
+                    localStorage.setItem("requested_amount", requestedAmount)
+                }
+
                 toast.success("Persona actualizada correctamente");
                 localStorage.setItem("id_person_dp", updateRes.data.id_person);
                 // setStatus("startRequest"); // O el paso que siga
@@ -136,11 +146,11 @@ const DPForm = ({person_data, setStatus}) => {
             });
 
 
-
             if (response.data.status === "approved") {
                 localStorage.setItem("id_person_dp", response.data.id_person);
                 localStorage.setItem("requested_amount",requestedAmount)
                 toast.success("Registro creado")
+                navigate("/")
                 setStatus("startRequest");
             }
 
@@ -164,10 +174,16 @@ const DPForm = ({person_data, setStatus}) => {
                         setStatus("");
                     }
                 });
-            } else {
-                console.error("❌ Error:", error);
-                toast.error(error.response?.data?.error)
+            } else if(error.response?.data?.status === "duplicated") {
+                withReactContent(Swal).fire({
+                    title: "Solicitante ya existe",
+                    text: error.response.data.error,
+                    showCloseButton : true,
+                })
             }
+
+            console.error("❌ Error:", error);
+            toast.error(error.response?.data?.error)
         }
     };
 
@@ -176,7 +192,11 @@ const DPForm = ({person_data, setStatus}) => {
                 <div className="w-full max-w-xl bg-white shadow-2xl border border-gray-400 p-5 lg:p-3 rounded-2xl">
 
                 {/* <h2 className="text-4xl text-blue-600 text-center font-bold mb-4">¡Bienvenid@!</h2> */}
-                <p className="text-center mt-3">Ingresa la información solicitada para continuar con tu solicitud</p>
+                <p className="text-center mt-3">
+                    {`Ingresa la información para ${!person_data ? 'crear' : 'actualizar'}  al solicitante`}
+                </p>
+
+                <hr className="mt-3"/>
 
                 <form onSubmit={handleSubmit(onSubmit)} className="mt-4 p-5 lg:p-4 grid grid-cols-1 md:grid-cols-2  gap-4">
                     <div>
@@ -204,25 +224,25 @@ const DPForm = ({person_data, setStatus}) => {
                     </div>
 
                     <div>
-                        <label htmlFor="first_lastname" className="block text-sm font-medium">Primer apellido:</label>
-                        <input type="text" {...register("first_lastname")} id="first_lastname"
+                        <label htmlFor="first_surname" className="block text-sm font-medium">Primer apellido:</label>
+                        <input type="text" {...register("first_surname")} id="first_lastname"
                             className="w-full border border-gray-300 mt-2 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-300"
                             placeholder="Ingresa tu primer apellido"/>
 
-                        {errors.first_lastname && (
-                            <span className="text-red-500 text-sm mt-2">{errors.first_lastname.message}</span>
+                        {errors.first_surname && (
+                            <span className="text-red-500 text-sm mt-2">{errors.first_surname.message}</span>
                         )}
 
                     </div>
 
                     <div>
-                        <label htmlFor="second_lastname" className="block text-sm font-medium">Segundo apellido:</label>
-                        <input type="text" {...register("second_lastname")} id="second_lastname"
+                        <label htmlFor="second_last_name" className="block text-sm font-medium">Segundo apellido:</label>
+                        <input type="text" {...register("second_last_name")} id="second_lastname"
                             className="w-full border border-gray-300 mt-2 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-300"
                             placeholder="Ingresa tu segundo apellido"/>
 
-                        {errors.second_lastname && (
-                            <span className="text-red-500 text-sm mt-2">{errors.second_lastname.message}</span>
+                        {errors.second_last_name && (
+                            <span className="text-red-500 text-sm mt-2">{errors.second_last_name.message}</span>
                         )}
                     </div>
 
@@ -235,7 +255,6 @@ const DPForm = ({person_data, setStatus}) => {
                         {errors.birthdate && (
                             <span className="text-red-500 text-sm mt-2">{errors.birthdate.message}</span>
                         )}
-
                     </div>
 
                     <div>
@@ -245,7 +264,7 @@ const DPForm = ({person_data, setStatus}) => {
                             <option value="">Selecciona..</option>
                             <option value="CC"> Cédula de ciudadania</option>
                             <option value="CE"> Cédula de extranjeria</option>
-                            <option value="PP"> Pasaporte</option>
+                            <option value="TPT"> Permiso de protección temporal</option>
                         </select>
 
                         {errors.document_type && (
@@ -265,19 +284,24 @@ const DPForm = ({person_data, setStatus}) => {
                     </div>
 
                     <div className="col-span-2">
-                        <label htmlFor="expedition_date" className="block text-sm font-medium">Fecha de expedición:</label>
-                        <input type="date" {...register("expedition_date")} id="expedition_date"
-                            className="w-full border border-gray-300 mt-2 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-300"/>
+                        <label htmlFor="expedition_location" className="block text-sm font-medium">Lugar de expedición:</label>
+                        <select {...register("expedition_location")}
+                            className="w-full border border-gray-300 mt-2 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-300">
+                            <option value="">Selecciona una ciudad</option>
+                            {cities.map((city) => (
+                                <option key={city.id} value={city.name}>{city.name}</option>
+                            ))}
+                        </select>
 
 
-                        {errors.expedition_date && (
-                            <span className="text-red-500 text-sm mt-2">{errors.expedition_date.message}</span>
+                        {errors.expedition_location && (
+                            <span className="text-red-500 text-sm mt-2">{errors.expedition_location.message}</span>
                         )}
                     </div>
 
                     <div>
                         <label htmlFor="cellular" className="block text-sm font-medium">Celular:</label>
-                        <input type="number" {...register("cellular")} id="cellular" maxLength={10} minLength={4}
+                        <input type="number" {...register("cellular")} id="cellular" maxLength={11} minLength={10}
                             className="w-full border border-gray-300 mt-2 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-300"
                             placeholder="Ingresa tu celular"/>
 
@@ -310,7 +334,6 @@ const DPForm = ({person_data, setStatus}) => {
                         {errors.nationality && (
                             <span className="text-red-500 text-sm mt-2">{errors.nationality.message}</span>
                         )}
-
                     </div>
 
                     <div>
@@ -328,7 +351,7 @@ const DPForm = ({person_data, setStatus}) => {
                         )}
                     </div>
 
-                    <div>
+                    <div className="col-span-2">
                         <label htmlFor="address" className="block text-sm font-medium">Dirección:</label>
                         <input type="text" {...register("address")} id="address"
                             className="w-full border border-gray-300 mt-2 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-300"
@@ -337,46 +360,31 @@ const DPForm = ({person_data, setStatus}) => {
                         {errors.address && (
                             <span className="text-red-500 text-sm mt-2">{errors.address.message}</span>
                         )}
-
                     </div>
 
-                    <div>
-                        <label htmlFor="gender" className="block text-sm font-medium">Género:</label>
-                        <select {...register("gender")}
-                            className="w-full border border-gray-300 mt-2 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-300">
-                            <option value="">Selecciona...</option>
-                            <option value="M">Masculino</option>
-                            <option value="F">Femenino</option>
-                        </select>
 
-                        {errors.gender && (
-                            <span className="text-red-500 text-sm mt-2">{errors.gender.message}</span>
+
+                    <div className="md:col-span-2">
+                        <label htmlFor="requested_amount" className="block text-sm font-medium">Monto solicitado:</label>
+                        <input
+                            type="text"
+                            id="requested_amount"
+                            value={requestedAmountDisplay}
+                            onChange={(e) => {
+                                const input = e.target.value;
+                                const raw = input.replace(/\D/g, ""); // Elimina todo excepto números
+                                setRequestedAmountDisplay(formatCurrency(raw)); // Formatea para mostrar
+                                setValue("requested_amount", parseInt(raw)); // Actualiza el valor real
+                            }}
+                            className="w-full border border-gray-300 mt-2 rounded px-3 py-2 focus:outline-none text-center
+                            focus:ring-2 focus:ring-yellow-300"
+                            placeholder="Ingresa el monto solicitado"
+                        />
+
+                        {errors.requested_amount && (
+                                <span className="text-red-500 text-sm mt-2">{errors.requested_amount.message}</span>
                         )}
                     </div>
-
-                    {!person_data && (
-                        <div className="md:col-span-2">
-                            <label htmlFor="requested_amount" className="block text-sm font-medium">Monto solicitado:</label>
-                            <input
-                                type="text"
-                                id="requested_amount"
-                                value={requestedAmountDisplay}
-                                onChange={(e) => {
-                                    const input = e.target.value;
-                                    const raw = input.replace(/\D/g, ""); // Elimina todo excepto números
-                                    setRequestedAmountDisplay(formatCurrency(raw)); // Formatea para mostrar
-                                    setValue("requested_amount", parseInt(raw)); // Actualiza el valor real
-                                }}
-                                className="w-full border border-gray-300 mt-2 rounded px-3 py-2 focus:outline-none text-center
-                                focus:ring-2 focus:ring-yellow-300"
-                                placeholder="Ingresa el monto solicitado"
-                            />
-
-                            {errors.requested_amount && (
-                                <span className="text-red-500 text-sm mt-2">{errors.requested_amount.message}</span>
-                            )}
-                        </div>
-                    )}
 
                     <div className="md:col-span-2">
                         <button type="submit"
