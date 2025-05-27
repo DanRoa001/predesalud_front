@@ -43,8 +43,10 @@ const DPForm = ({person_data, setStatus}) => {
     
     useEffect(() => {
         if (person_data && cities.length > 0) {
+
+
             setValue("first_name", person_data.first_name || "");
-            setValue("middle_name", person_data.middle_name || "");
+            setValue("second_name", person_data.middle_name || "");
             setValue("first_surname", person_data.first_surname || "");
             setValue("second_last_name", person_data.second_last_name || "");
             setValue("email", person_data.email || "");
@@ -56,11 +58,6 @@ const DPForm = ({person_data, setStatus}) => {
             setValue("nationality", person_data.nationality || "");
             setValue("address", person_data.address || "");
             setValue("city", person_data.city || "");
-
-            const storedAmount = localStorage.getItem("requested_amount");
-            if (storedAmount) {
-                setRequestedAmountDisplay(formatCurrency(storedAmount));
-            }
         }
     }, [person_data, cities]);
 
@@ -73,7 +70,6 @@ const DPForm = ({person_data, setStatus}) => {
 
     const onSubmit = async (data) => {
 
-        console.log(errors)
 
         var requestedAmount
 
@@ -131,13 +127,10 @@ const DPForm = ({person_data, setStatus}) => {
                     person_data: payload,
                 });
 
-                if(localStorage.getItem("requested_amount") != requestedAmount){
-                    localStorage.setItem("requested_amount", requestedAmount)
-                }
-
                 toast.success("Persona actualizada correctamente");
                 localStorage.setItem("id_person_dp", updateRes.data.id_person);
                 // setStatus("startRequest"); // O el paso que siga
+                navigate("/")
                 return;
             }
 
@@ -365,29 +358,31 @@ const DPForm = ({person_data, setStatus}) => {
                     </div>
 
 
+                    
+                    {!person_data && (
+                        <div className="md:col-span-2">
+                            <label htmlFor="requested_amount" className="block text-sm font-medium">Monto solicitado:</label>
+                            <input
+                                type="text"
+                                id="requested_amount"
+                                value={requestedAmountDisplay}
+                                onChange={(e) => {
+                                    const input = e.target.value;
+                                    const raw = input.replace(/\D/g, ""); // Elimina todo excepto números
+                                    setRequestedAmountDisplay(formatCurrency(raw)); // Formatea para mostrar
+                                    setValue("requested_amount", parseInt(raw)); // Actualiza el valor real
+                                }}
+                                className="w-full border border-gray-300 mt-2 rounded px-3 py-2 focus:outline-none text-center
+                                focus:ring-2 focus:ring-yellow-300"
+                                placeholder="Ingresa el monto solicitado"
+                            />
 
-                    <div className="md:col-span-2">
-                        <label htmlFor="requested_amount" className="block text-sm font-medium">Monto solicitado:</label>
-                        <input
-                            type="text"
-                            {...register("requested_amount")} 
-                            id="requested_amount"
-                            value={requestedAmountDisplay}
-                            onChange={(e) => {
-                                const input = e.target.value;
-                                const raw = input.replace(/\D/g, ""); // Elimina todo excepto números
-                                setRequestedAmountDisplay(formatCurrency(raw)); // Formatea para mostrar
-                                setValue("requested_amount", parseInt(raw)); // Actualiza el valor real
-                            }}
-                            className="w-full border border-gray-300 mt-2 rounded px-3 py-2 focus:outline-none text-center
-                            focus:ring-2 focus:ring-yellow-300"
-                            placeholder="Ingresa el monto solicitado"
-                        />
+                            {errors.requested_amount && (
+                                    <span className="text-red-500 text-sm mt-2">{errors.requested_amount.message}</span>
+                            )}
+                        </div>
+                    )}
 
-                        {errors.requested_amount && (
-                                <span className="text-red-500 text-sm mt-2">{errors.requested_amount.message}</span>
-                        )}
-                    </div>
 
                     <div className="md:col-span-2">
                         <button type="submit"

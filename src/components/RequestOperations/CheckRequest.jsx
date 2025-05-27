@@ -101,6 +101,10 @@ const CheckRequest = () => {
                             <p><strong>Nombre: </strong> {getFullName(dpData)}</p>
                             <p><strong>Documento:</strong> {dpData.document_number}</p>
                             <p><strong>Correo:</strong> {dpData.email}</p>
+                            <p><strong>Documento:</strong> {dpData.document_number}</p>
+                            <p><strong>Correo:</strong> {dpData.email}</p>
+                            <p><strong>Documento:</strong> {dpData.document_number}</p>
+                            <p><strong>Correo:</strong> {dpData.email}</p>
                         </div>
                     )}
 

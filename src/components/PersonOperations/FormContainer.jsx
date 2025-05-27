@@ -21,7 +21,6 @@ function FormContainer() {
           const fetchData = await crediexpressAPI.post("/func/find_person", {
             id_person : idPerson
           })
-
           setPersonData(fetchData.data)
         }
 

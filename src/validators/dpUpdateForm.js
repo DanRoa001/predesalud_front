@@ -41,7 +41,4 @@ export const dpUpdateFormSchema = Yup.object().shape({
   city: Yup.string()
            .required("Selecciona una ciudad"),
 
-  requested_amount : Yup.string()
-                        .required("El monto es requerido")
-
 });
