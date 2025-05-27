@@ -140,6 +140,7 @@ const DPForm = ({person_data, setStatus}) => {
             if (response.data.status === "approved") {
                 localStorage.setItem("id_person_dp", response.data.id_person);
                 localStorage.setItem("requested_amount",requestedAmount)
+                toast.success("Registro creado")
                 setStatus("startRequest");
             }
 
