@@ -18,6 +18,10 @@ const CheckRequest = () => {
 
     const [loadingRequest,setLoadingRequest] = useState(false)
 
+    const getFullName = ({ first_name, middle_name, first_surname, second_last_name }) => {
+        return [first_name, middle_name, first_surname, second_last_name].filter(Boolean).join(" ");
+    };
+
     useEffect(() => {
         const id_person_dp = localStorage.getItem("id_person_dp")
         const id_person_ds = localStorage.getItem("id_person_ds")
@@ -94,7 +98,7 @@ const CheckRequest = () => {
                     { !loadingRequest &&  dpData && (
                         <div className="mb-4 text-left">
                             <h2 className="text-xl font-semibold text-blue-600">🧑 Deudor Principal</h2>
-                            <p><strong>Nombre:</strong> {dpData.name}</p>
+                            <p><strong>Nombre: </strong> {getFullName(dpData)}</p>
                             <p><strong>Documento:</strong> {dpData.document_number}</p>
                             <p><strong>Correo:</strong> {dpData.email}</p>
                         </div>
@@ -103,7 +107,7 @@ const CheckRequest = () => {
                     {!loadingRequest && dsData && (
                         <div className="mb-4 text-left">
                             <h2 className="text-xl font-semibold text-green-600">👥 Deudor Solidario</h2>
-                            <p><strong>Nombre:</strong> {dsData.name}</p>
+                            <p><strong>Nombre:</strong> {getFullName(dsData)}</p>
                             <p><strong>Documento:</strong> {dsData.document_number}</p>
                             <p><strong>Correo:</strong> {dsData.email}</p>
                         </div>
