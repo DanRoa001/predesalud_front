@@ -1,17 +1,17 @@
 import * as Yup from "yup";
 
-export const dsFormSchema = Yup.object().shape({
-   first_name: Yup.string()
-                  .required("El primer nombre es obligatorio"),
- 
-   second_name: Yup.string()
-                   .required("El segundo nombre es obligatorio"),
- 
-   first_lastname: Yup.string()
-                      .required("El primer apellido es obligatorio"),
- 
-   second_lastname: Yup.string()
-                       .required("El segundo apellido es requerido"),
+export const dpUpdateFormSchema = Yup.object().shape({
+  first_name: Yup.string()
+                 .required("El primer nombre es obligatorio"),
+
+  second_name: Yup.string()
+                  .required("El segundo nombre es obligatorio"),
+
+  first_lastname: Yup.string()
+                     .required("El primer apellido es obligatorio"),
+
+  second_lastname: Yup.string()
+                      .required("El segundo apellido es requerido"),
 
   email: Yup.string()
             .required("El correo es obligatorio")

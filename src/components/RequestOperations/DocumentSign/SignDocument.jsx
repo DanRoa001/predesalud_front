@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { BeatLoader } from 'react-spinners'
 import { toast } from 'react-toastify';
-import { crediexpressAPI } from '../../api/axiosClient';
+import { crediexpressAPI } from '../../../api/axiosClient';
 
 const SignDocument = () => {
 

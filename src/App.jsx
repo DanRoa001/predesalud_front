@@ -1,18 +1,22 @@
 import { useEffect, useState } from "react"
-import InitialForm from "./components/PrincipalDebtor/InitialForm"
-import DPForm from "./components/PrincipalDebtor/DPForm"
-import FormContainer from "./components/FormContainer"
-import SignatureUrl from "./components/Signature/SignatureUrl"
 import { Route, Routes } from "react-router-dom"
-import SignDocument from "./components/DocumentSign/SignDocument"
-import SignedDocument from "./components/Alerts/SignedDocument"
-import DSForm from "./components/JointDebtor/DSForm"
+import FormContainer from "./components/PersonOperations/FormContainer"
+import CheckInfo from "./components/PersonOperations/CheckInfo/CheckInfo"
+
+import SignatureUrl from "./components/RequestOperations/Signature/SignatureUrl"
+import SignDocument from "./components/RequestOperations/DocumentSign/SignDocument"
+import SignedDocument from "./components/RequestOperations/Alerts/SignedDocument"
+import StartRequest from "./components/RequestOperations/StartRequest/StartRequest"
+import CheckRequest from "./components/RequestOperations/CheckRequest"
 
 function App() {
     return (
       <Routes>
-        <Route path="/" element={<FormContainer />} />
-        <Route path="/joint_debtor/:id_request" element={<DSForm/>}/>
+        <Route path="/" element={<CheckInfo/>} />
+        <Route path="/register" element={<FormContainer/>} /> 
+
+        <Route path="/start_request" element={<StartRequest/>}/>
+        <Route path="/check_request"element={<CheckRequest/>}/>
         <Route path="/sign/:id_request/:document/:cellphone" element={<SignatureUrl/>} />
         <Route path="/check_sign" element={<SignDocument/>} />
         <Route path="/signed_document" element={<SignedDocument/>} />

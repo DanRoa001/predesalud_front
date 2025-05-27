@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { crediexpressAPI } from '../../api/axiosClient'
+import { crediexpressAPI } from '../../../api/axiosClient'
 import { replace, useLocation, useParams } from 'react-router-dom'
 import { BeatLoader } from 'react-spinners'
 
