@@ -95,25 +95,81 @@ const CheckRequest = () => {
                         </>
                     )}
 
-                    { !loadingRequest &&  dpData && (
-                        <div className="mb-4 text-left">
-                            <h2 className="text-xl font-semibold text-blue-600">🧑 Deudor Principal</h2>
-                            <p><strong>Nombre: </strong> {getFullName(dpData)}</p>
-                            <p><strong>Documento:</strong> {dpData.document_number}</p>
-                            <p><strong>Correo:</strong> {dpData.email}</p>
-                            <p><strong>Documento:</strong> {dpData.document_number}</p>
-                            <p><strong>Correo:</strong> {dpData.email}</p>
-                            <p><strong>Documento:</strong> {dpData.document_number}</p>
-                            <p><strong>Correo:</strong> {dpData.email}</p>
-                        </div>
-                    )}
+                {!loadingRequest && dpData && (
+                    <div className="mb-4 text-left">
+                        <h2 className="text-xl font-semibold text-yellow-600 mb-2">🧑 Deudor Principal</h2>
+
+                        <table className="w-full text-sm border border-gray-300 rounded">
+                        <tbody>
+                            <tr className="border-b">
+                                <td className="font-semibold px-2 py-1">Nombre:</td>
+                                <td className="px-2 py-1">{getFullName(dpData)}</td>
+                            </tr>
+                            <tr className="border-b">
+                                <td className="font-semibold px-2 py-1">Número de celular:</td>
+                                <td className="px-2 py-1">{dpData.cellular}</td>
+                            </tr>
+                            <tr className="border-b">
+                                <td className="font-semibold px-2 py-1">Correo:</td>
+                                <td className="px-2 py-1">{dpData.email}</td>
+                            </tr>
+                            <tr className="border-b">
+                                <td className="font-semibold px-2 py-1">Documento:</td>
+                                <td className="px-2 py-1">{`${dpData.document_type} ${dpData.document_number}`}</td>
+                            </tr>
+                            <tr className="border-b">
+                                <td className="font-semibold px-2 py-1">Lugar de expedición:</td>
+                                <td className="px-2 py-1">{dpData.expedition_location}</td>
+                            </tr>
+                            <tr className="border-b">
+                                <td className="font-semibold px-2 py-1">Nacionalidad:</td>
+                                <td className="px-2 py-1">{dpData.nationality}</td>
+                            </tr>
+                            <tr>
+                                <td className="font-semibold px-2 py-1">Fecha de nacimiento:</td>
+                                <td className="px-2 py-1">{dpData.birthdate}</td>
+                            </tr>
+                        </tbody>
+                        </table>
+                    </div>
+                )}
 
                     {!loadingRequest && dsData && (
-                        <div className="mb-4 text-left">
-                            <h2 className="text-xl font-semibold text-green-600">👥 Deudor Solidario</h2>
-                            <p><strong>Nombre:</strong> {getFullName(dsData)}</p>
-                            <p><strong>Documento:</strong> {dsData.document_number}</p>
-                            <p><strong>Correo:</strong> {dsData.email}</p>
+                        <div className="mb-3 text-left">
+                            <h2 className="text-xl font-semibold text-yellow-600 mb-2">👥 Deudor Solidario</h2>
+
+                            <table className="w-full text-sm border border-gray-300 rounded">
+                                <tbody>
+                                    <tr className="border-b">
+                                        <td className="font-semibold px-2 py-1">Nombre:</td>
+                                        <td className="px-2 py-1">{getFullName(dsData)}</td>
+                                    </tr>
+                                    <tr className="border-b">
+                                        <td className="font-semibold px-2 py-1">Número de celular:</td>
+                                        <td className="px-2 py-1">{dsData.cellular}</td>
+                                    </tr>
+                                    <tr className="border-b">
+                                        <td className="font-semibold px-2 py-1">Correo:</td>
+                                        <td className="px-2 py-1">{dsData.email}</td>
+                                    </tr>
+                                    <tr className="border-b">
+                                        <td className="font-semibold px-2 py-1">Documento:</td>
+                                        <td className="px-2 py-1">{`${dsData.document_type} ${dsData.document_number}`}</td>
+                                    </tr>
+                                    <tr className="border-b">
+                                        <td className="font-semibold px-2 py-1">Lugar de expedición:</td>
+                                        <td className="px-2 py-1">{dsData.expedition_location}</td>
+                                    </tr>
+                                    <tr className="border-b">
+                                        <td className="font-semibold px-2 py-1">Nacionalidad:</td>
+                                        <td className="px-2 py-1">{dsData.nationality}</td>
+                                    </tr>
+                                    <tr>
+                                        <td className="font-semibold px-2 py-1">Fecha de nacimiento:</td>
+                                        <td className="px-2 py-1">{dsData.birthdate}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
                         </div>
                     )}
 
