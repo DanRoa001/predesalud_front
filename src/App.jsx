@@ -8,18 +8,21 @@ import SignDocument from "./components/RequestOperations/DocumentSign/SignDocume
 import SignedDocument from "./components/RequestOperations/Alerts/SignedDocument"
 import StartRequest from "./components/RequestOperations/StartRequest/StartRequest"
 import CheckRequest from "./components/RequestOperations/CheckRequest"
+import Layout from "./components/Layout/Layout"
 
 function App() {
     return (
-      <Routes>
-        <Route path="/" element={<CheckInfo/>} />
-        <Route path="/register" element={<FormContainer/>} /> 
+      <Routes >
+          <Route element={<Layout/>}>
+              <Route path="/" element={<CheckInfo/>} />
+              <Route path="/register" element={<FormContainer/>} /> 
 
-        <Route path="/start_request" element={<StartRequest/>}/>
-        <Route path="/check_request"element={<CheckRequest/>}/>
-        <Route path="/sign/:id_request/:document/:cellphone" element={<SignatureUrl/>} />
-        <Route path="/check_sign" element={<SignDocument/>} />
-        <Route path="/signed_document" element={<SignedDocument/>} />
+              <Route path="/start_request" element={<StartRequest/>}/>
+              <Route path="/check_request"element={<CheckRequest/>}/>
+              <Route path="/sign/:id_request/:document/:cellphone" element={<SignatureUrl/>} />
+              <Route path="/check_sign" element={<SignDocument/>} />
+              <Route path="/signed_document" element={<SignedDocument/>} />
+          </Route>      
       </Routes>
     )
 }

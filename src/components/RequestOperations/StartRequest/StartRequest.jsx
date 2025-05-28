@@ -21,11 +21,11 @@ const StartRequest = () => {
                 document_number: document,
             })
 
-            const { nextStep, id_person } = response.data
+            const { nextStep, id_person, id_request } = response.data
 
             switch (nextStep) {
                 case "startRequest":
-                    navigate(`/check_request?id=${id_person}`)
+                    navigate(`/check_request?id=${id_person}&request=${id_request}`)
                 break
             }
         } catch (error) {

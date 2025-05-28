@@ -9,8 +9,10 @@ import { toast } from "react-toastify";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import withReactContent from "sweetalert2-react-content";
 import Swal from "sweetalert2";
+import CrediLogo from  "/credx-logo.png"
 
-const DPForm = ({person_data, setStatus}) => {
+
+const DPForm = ({person_data,request, hasOpenRequest, setStatus, setIDRequestDS}) => {
 
     const [searchParams] = useSearchParams()
 
@@ -22,6 +24,8 @@ const DPForm = ({person_data, setStatus}) => {
     const navigate = useNavigate()
     const [cities, setCities] = useState([]);
 
+
+    console.log(person_data, request, hasOpenRequest)
 
     const document = searchParams.get("document")
 
@@ -40,10 +44,14 @@ const DPForm = ({person_data, setStatus}) => {
         fetchCities();
     }, []);
 
-    
+    useEffect(() => {
+        register("requested_amount", {
+            valueAsNumber: true,
+        });
+    }, [register]);
+
     useEffect(() => {
         if (person_data && cities.length > 0) {
-
 
             setValue("first_name", person_data.first_name || "");
             setValue("second_name", person_data.middle_name || "");
@@ -58,7 +66,14 @@ const DPForm = ({person_data, setStatus}) => {
             setValue("nationality", person_data.nationality || "");
             setValue("address", person_data.address || "");
             setValue("city", person_data.city || "");
+
+            if(hasOpenRequest && request?.request?.amount){
+                const amount = request.request.amount;
+                setValue("requested_amount", amount); 
+                setRequestedAmountDisplay(formatCurrency(amount.toString()));
+            }
         }
+
     }, [person_data, cities]);
 
 
@@ -68,13 +83,13 @@ const DPForm = ({person_data, setStatus}) => {
         }
     }, [document]);
 
+
     const onSubmit = async (data) => {
 
-
-        var requestedAmount
-
-
         try {
+
+            var numericAmount
+
             const {
                 first_name,
                 second_name,
@@ -92,12 +107,12 @@ const DPForm = ({person_data, setStatus}) => {
                 requested_amount,
             } = data;
 
-            const fullname = [
-                first_name,
-                second_name,
-                first_surname,
-                second_last_name,
-            ].filter(Boolean).join(" ");
+            if(hasOpenRequest){
+                numericAmount = parseInt(
+                    requested_amount.toString().replace(/[^\d]/g, '')
+                );
+            }
+
 
             const payload = {
                 first_name,
@@ -113,23 +128,16 @@ const DPForm = ({person_data, setStatus}) => {
                 expedition_location,
                 address,
                 city,
-                requested_amount,
+                ...(hasOpenRequest && { requested_amount: numericAmount }),
             };
 
-            requestedAmount = payload.requested_amount
-
             if (person_data) {
-
-                delete payload.requested_amount                
-
-                const updateRes = await crediexpressAPI.put("/func/update_only_dp", {
+                const response = await crediexpressAPI.put("/func/update_only_dp", {
                     id_person: person_data.id_person,
                     person_data: payload,
                 });
 
-                toast.success("Persona actualizada correctamente");
-                localStorage.setItem("id_person_dp", updateRes.data.id_person);
-                // setStatus("startRequest"); // O el paso que siga
+                toast.success(response.data.message);
                 navigate("/")
                 return;
             }
@@ -137,23 +145,21 @@ const DPForm = ({person_data, setStatus}) => {
 
             // Modo creación
             const response = await crediexpressAPI.post("/func/create_only_dp", {
+                id_client : import.meta.env.VITE_CLIENT_ID,
                 person_data: payload,
             });
 
 
             if (response.data.status === "approved") {
-                localStorage.setItem("id_person_dp", response.data.id_person);
-                localStorage.setItem("requested_amount",requestedAmount)
+
                 toast.success("Registro creado")
+                setIDRequestDS(response.data.id_request)
                 navigate("/")
                 setStatus("startRequest");
             }
 
         } catch (error) {
             if (error.response?.data?.status === "rejected") {
-
-                localStorage.setItem("id_person_dp", error.response.data.id_person)
-                localStorage.setItem("requested_amount",requestedAmount)
 
                 withReactContent(Swal).fire({
                     title: "No cumples con los parámetros del motor",
@@ -164,6 +170,7 @@ const DPForm = ({person_data, setStatus}) => {
                     denyButtonText: "No añadir",
                 }).then((result) => {
                     if (result.isConfirmed) {
+                        setIDRequestDS(error.response.data.id_request)
                         setStatus("joint_debtor");
                     } else {
                         setStatus("");
@@ -242,7 +249,7 @@ const DPForm = ({person_data, setStatus}) => {
                     </div>
 
 
-                    <div className="col-span-2">
+                    <div className="col-span-1 lg:col-span-2">
                         <label htmlFor="birthdate" className="block text-sm font-medium">Fecha de nacimiento:</label>
                         <input type="date" {...register("birthdate")} id="birthdate"  min="1970-01-01" max="2004-12-31"
                             className="w-full border border-gray-300 mt-2 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-300"/>
@@ -278,7 +285,7 @@ const DPForm = ({person_data, setStatus}) => {
                         )}
                     </div>
 
-                    <div className="col-span-2">
+                    <div className="col-span-1 lg:col-span-2">
                         <label htmlFor="expedition_location" className="block text-sm font-medium">Lugar de expedición:</label>
                         <select {...register("expedition_location")}
                             className="w-full border border-gray-300 mt-2 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-300">
@@ -346,7 +353,7 @@ const DPForm = ({person_data, setStatus}) => {
                         )}
                     </div>
 
-                    <div className="col-span-2">
+                    <div className="col-span-1 lg:col-span-2">
                         <label htmlFor="address" className="block text-sm font-medium">Dirección:</label>
                         <input type="text" {...register("address")} id="address"
                             className="w-full border border-gray-300 mt-2 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-300"
@@ -357,33 +364,29 @@ const DPForm = ({person_data, setStatus}) => {
                         )}
                     </div>
 
+                    {hasOpenRequest  &&  (
+                        <div className="col-span-1 lg:col-span-2">
+                                <label htmlFor="requested_amount" className="block text-sm font-medium">Monto solicitado:</label>
+                                <input type="text"
+                                    id="requested_amount"
+                                    value={requestedAmountDisplay}
+                                    onChange={(e) => {
+                                        const input = e.target.value;
+                                        const raw = input.replace(/\D/g, ""); 
+                                        setRequestedAmountDisplay(formatCurrency(raw)); // Formatea para mostrar
+                                        setValue("requested_amount", raw ? parseInt(raw) : ""); // Actualiza el valor real
+                                    }}
+                                    className="w-full border border-gray-300 mt-2 rounded px-3 py-2 focus:outline-none text-center
+                                    focus:ring-2 focus:ring-yellow-300"
+                                    placeholder="Ingresa el monto solicitado"
+                                />
 
-                    
-                    {!person_data && (
-                        <div className="md:col-span-2">
-                            <label htmlFor="requested_amount" className="block text-sm font-medium">Monto solicitado:</label>
-                            <input
-                                type="text"
-                                id="requested_amount"
-                                value={requestedAmountDisplay}
-                                onChange={(e) => {
-                                    const input = e.target.value;
-                                    const raw = input.replace(/\D/g, ""); // Elimina todo excepto números
-                                    setRequestedAmountDisplay(formatCurrency(raw)); // Formatea para mostrar
-                                    setValue("requested_amount", parseInt(raw)); // Actualiza el valor real
-                                }}
-                                className="w-full border border-gray-300 mt-2 rounded px-3 py-2 focus:outline-none text-center
-                                focus:ring-2 focus:ring-yellow-300"
-                                placeholder="Ingresa el monto solicitado"
-                            />
-
-                            {errors.requested_amount && (
+                                {errors.requested_amount && (
                                     <span className="text-red-500 text-sm mt-2">{errors.requested_amount.message}</span>
-                            )}
+                                )}
                         </div>
                     )}
-
-
+                
                     <div className="md:col-span-2">
                         <button type="submit"
                             className="w-full bg-yellow-400 rounded-lg p-2 text-white font-semibold text-center hover:bg-yellow-500">

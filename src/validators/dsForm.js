@@ -1,5 +1,4 @@
 import * as Yup from "yup";
-import { differenceInYears }  from "date-fns"
 
 export const dsFormSchema = Yup.object().shape({
    first_name: Yup.string()
@@ -7,7 +6,7 @@ export const dsFormSchema = Yup.object().shape({
  
    second_name: Yup.string(),
  
-   first_lastname: Yup.string()
+   first_surname: Yup.string()
                       .required("El primer apellido es obligatorio"),
  
    second_lastname: Yup.string(),
@@ -33,8 +32,8 @@ export const dsFormSchema = Yup.object().shape({
    nationality: Yup.string()
                      .required("Selecciona una nacionalidad"),
 
-   expedition_date: Yup.string()
-                        .required("La fecha de expedición es obligatoria"),
+  expedition_location: Yup.string()
+                      .required("El lugar de expedición es obligatorio"),
 
    address: Yup.string()
                .required("La dirección es obligatoria"),

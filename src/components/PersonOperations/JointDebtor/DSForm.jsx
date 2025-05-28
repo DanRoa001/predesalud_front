@@ -6,11 +6,13 @@ import { yupResolver } from "@hookform/resolvers/yup/src/yup.js";
 import { toast } from "react-toastify";
 import { dsFormSchema } from "../../../validators/dsForm";
 
-const DSForm = () => {
+const DSForm = ({id_request}) => {
 
     const { register, handleSubmit , formState: { errors }} = useForm({ 
         resolver: yupResolver(dsFormSchema)
     });
+
+    console.log(id_request)
 
     const [cities, setCities] = useState([]);
 
@@ -80,11 +82,11 @@ const DSForm = () => {
                 expedition_location,
                 address,
                 city,
-                requested_amount,
             }
 
             // Enviar al backend
             const response = await crediexpressAPI.post("/func/create_only_ds", {
+                id_request : id_request,
                 person_data: payload
             });
 
@@ -136,8 +138,8 @@ const DSForm = () => {
                             className="w-full border border-gray-300 mt-2 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-300"
                             placeholder="Ingresa tu primer apellido"/>
 
-                        {errors.first_lastname && (
-                            <span className="text-red-500 text-sm mt-2">{errors.first_lastname.message}</span>
+                        {errors.first_surname && (
+                            <span className="text-red-500 text-sm mt-2">{errors.first_surname.message}</span>
                         )}
 
                     </div>
@@ -148,13 +150,13 @@ const DSForm = () => {
                             className="w-full border border-gray-300 mt-2 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-300"
                             placeholder="Ingresa tu segundo apellido"/>
 
-                        {errors.second_lastname && (
-                            <span className="text-red-500 text-sm mt-2">{errors.second_lastname.message}</span>
+                        {errors.second_last_name && (
+                            <span className="text-red-500 text-sm mt-2">{errors.second_last_name.message}</span>
                         )}
 
                     </div>
 
-                    <div className="col-span-2">
+                    <div className="lg:col-span-2">
                         <label htmlFor="birthdate" className="block text-sm font-medium">Fecha de nacimiento:</label>
                         <input type="date" {...register("birthdate")} id="birthdate" min="1970-01-01" max="2004-12-31"
                             className="w-full border border-gray-300 mt-2 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-300"/>
@@ -191,7 +193,7 @@ const DSForm = () => {
                         )}
                     </div>
 
-                    <div className="col-span-2">
+                    <div className="lg:col-span-2">
                         <label htmlFor="expedition_location" className="block text-sm font-medium">Lugar de expedición:</label>
                         <select {...register("expedition_location")}
                             className="w-full border border-gray-300 mt-2 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-300">
@@ -262,7 +264,7 @@ const DSForm = () => {
                         )}
                     </div>
 
-                    <div>
+                    <div className="lg:col-span-2">
                         <label htmlFor="address" className="block text-sm font-medium">Dirección:</label>
                         <input type="text" {...register("address")} id="address"
                             className="w-full border border-gray-300 mt-2 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-300"
